@@ -11,10 +11,10 @@ const MongoURL = `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@jobsapi.intf
 
 
 const ConnectDB = async () => {
-    try{
+    try {
         const connect = await mongoose.connect(MongoURL)
         console.log("Databse Connected.", connect.connection.name, connect.connection.host);
-    }catch (err) {
+    } catch (err) {
         console.log("Failed to connect with database", err);
         process.exit(1)
     }
