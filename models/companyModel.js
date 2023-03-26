@@ -1,29 +1,26 @@
 const mongoose = require("mongoose")
 
 
-const UserSchema = mongoose.Schema({
-    user_id: {
+const CompanySchema = mongoose.Schema({
+    company_id: {
         type: String,
         required: true
     },
-    username: {
+    name: {
         type: String,
         required: true,
         unique: true
     },
-    name: {
+    owner_name: {
         type: String,
-        required: true
+        required: true,
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     password: {
-        type: String,
-        required: true
-    },
-    github_url: {
         type: String,
         required: true
     },
@@ -31,8 +28,9 @@ const UserSchema = mongoose.Schema({
         type: String,
         requied: true
     },
-    resume_link: {
-        type: String
+    website_link: {
+        type: String,
+        required: true
     }
 },
     {
@@ -40,5 +38,5 @@ const UserSchema = mongoose.Schema({
     }
 )
 
-const UserModel = mongoose.model("Users", UserSchema)
-module.exports = UserModel;
+const CompanyModel = mongoose.model("Compnay", CompanySchema)
+module.exports = CompanyModel;

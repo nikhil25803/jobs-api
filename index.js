@@ -3,6 +3,7 @@ const dotenv = require("dotenv")
 const ConnectDB = require("./config/databse")
 const bodyparser = require("body-parser")
 const userRoutes = require("./routes/usersRoute")
+const companyRoutes = require("./routes/companyRoute")
 const errorHandler = require("./middlewares/errorHandler")
 
 // Load .env 
@@ -35,6 +36,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/user', userRoutes)
+app.use('/company', companyRoutes)
 app.use(errorHandler)
 
 // Define a PORT

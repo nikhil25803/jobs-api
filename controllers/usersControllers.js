@@ -57,6 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
         const newUser = await UserModel.create({
             user_id: uuid(),
             username,
+            name,
             email,
             password: hashedPassword,
             github_url,
