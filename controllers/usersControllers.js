@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler")
 const S3Upload = require("../config/s3Service")
 const UserModel = require("../models/usersModel")
 const uuid = require("uuid").v4;
+const jwt = require("jsonwebtoken")
 
 
 
@@ -73,5 +74,93 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 })
 
+const loginUser = asyncHandler(async (req, res) => {
+    const { username, password } = req.body
+    if (!username || !password) {
+        res.status(400)
+        throw new Error("Both username and password")
+    }
 
-module.exports = { registerUser }
+    const user = await UserModel.findOne({ username })
+    if (user && bcrypt.compare(password, user.password)) {
+        const accessToken = jwt.sign({
+            user: {
+                user_id: user.user_id,
+                username: user.username,
+                email: user.email,
+                github_url: user.github_url,
+                linkedin_url: user.linkedin_url,
+                resume_link: user.resume_link
+            }
+        }, process.env.JWT_ACCESS_TOKEN, { expiresIn: "30m" })
+        res.status(200)
+            .json({
+                "status": res.statusCode,
+                "message": `User: ${username} has been LoggedIn`,
+                "token": accessToken
+            })
+    } else {
+        res.status(404)
+        throw new Error("Unable to login user")
+    }
+})
+
+const userDetails = asyncHandler(async (req, res) => {
+    const username = req.params.username
+    if (username === req.user.username) {
+        const userInDatabase = await UserModel.findOne({ username })
+        if (userInDatabase) {
+            res.status(200).json({
+                "status": res.statusCode,
+                "data": req.user
+            })
+        } else {
+            res.status(404).json({
+                "status": res.statusCode,
+                "message": "User is not available"
+            })
+        }
+    } else {
+        res.status(500)
+        throw new Error("User is either not loggedin or not available")
+    }
+})
+
+
+const updateUser = asyncHandler(async (req, res) => {
+    const username = req.params.username
+    console.log(req.user);
+    if (username !== req.user.username) {
+        res.status(401)
+        throw new Error(`Username: ${username} is either not loggedin or incorrect`)
+    }
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+        username,
+        req.body,
+        { new: true }
+    )
+
+    res.status(201).json({
+        "status": res.statusCode,
+        "message": "User data has been updated",
+        "data": updatedUser
+    })
+})
+
+const deleteUser = asyncHandler(async (req, res) => {
+    const username = req.params.username
+    if (username !== req.user.username) {
+        res.status(401)
+        throw new Error(`Username: ${username} is either not loggedin or incorrect`)
+    }
+
+    const userToDelete = await UserModel.findOneAndDelete(username)
+    res.status(202).json({
+        "status": res.statusCode,
+        "message": `User with username: ${username} has been deleted`
+    })
+})
+
+
+module.exports = { registerUser, loginUser, userDetails, updateUser, deleteUser }
