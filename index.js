@@ -3,6 +3,7 @@ const dotenv = require("dotenv")
 const ConnectDB = require("./config/databse")
 const bodyparser = require("body-parser")
 const userRoutes = require("./routes/usersRoute")
+const errorHandler = require("./middlewares/errorHandler")
 
 // Load .env 
 dotenv.config()
@@ -34,7 +35,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/user', userRoutes)
-
+app.use(errorHandler)
 
 // Define a PORT
 const PORT = process.env.PORT || 3000

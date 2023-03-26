@@ -1,7 +1,6 @@
 const mongoose = require("mongoose")
 
 
-
 const UserSchema = mongoose.Schema({
     user_id: {
         type: String,
@@ -17,10 +16,6 @@ const UserSchema = mongoose.Schema({
         required: true
     },
     password: {
-        type: String,
-        required: true
-    },
-    confirm_password: {
         type: String,
         required: true
     },
