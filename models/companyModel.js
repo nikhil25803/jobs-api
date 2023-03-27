@@ -31,6 +31,15 @@ const CompanySchema = mongoose.Schema({
     website_link: {
         type: String,
         required: true
+    },
+    recruitersList: {
+        type: [
+            {
+                name: String,
+                email: String
+            }
+        ],
+        default: undefined
     }
 },
     {
@@ -38,5 +47,5 @@ const CompanySchema = mongoose.Schema({
     }
 )
 
-const CompanyModel = mongoose.model("Compnay", CompanySchema)
+const CompanyModel = mongoose.model("Company", CompanySchema)
 module.exports = CompanyModel;

@@ -25,4 +25,10 @@ companyRoute.put('/:company_id/update', companyTokenVerification, companyControl
 companyRoute.delete('/:company_id/delete', companyTokenVerification, companyController.deleteCompany)
 
 
+// Recruiters
+
+// Add a new recruiter to the list
+companyRoute.put('/:company_id/recruiter/add', companyTokenVerification, companyController.addRecuriter)
+
+
 module.exports = companyRoute;

@@ -15,7 +15,8 @@ const registerCompany = asyncHandler(async (req, res) => {
         password,
         confirm_password,
         linkedin_url,
-        website_link
+        website_link,
+        recruitersList,
     } = req.body
 
 
@@ -53,7 +54,8 @@ const registerCompany = asyncHandler(async (req, res) => {
             email,
             password: hashedPassword,
             linkedin_url,
-            website_link
+            website_link,
+            recruitersList
         })
         res.status(201).json({
             "status": res.statusCode,
@@ -151,4 +153,35 @@ const deleteCompany = asyncHandler(async (req, res) => {
     })
 })
 
-module.exports = { registerCompany, companyLogin, companyDetails, updateCompanyDetails, deleteCompany }
+const addRecuriter = asyncHandler(async (req, res) => {
+    const recruiter = req.body
+    if (!recruiter) {
+        res.status(400)
+        throw new Error("A body with email and name is required")
+    }
+    const company_id = req.params.company_id
+    if (company_id !== req.user.company_id) {
+        res.status(401)
+        throw new Error(`Comany with id: ${company_id} is either not loggedin or incorrect`)
+    }
+    // console.log(req.user);
+    try {
+        const companyToAdd = await CompanyModel.findOne({ company_id })
+        const recruiterList = companyToAdd.recruitersList.push(recruiter)
+        await companyToAdd.save()
+        res.status(201).json({
+            "status": res.statusCode,
+            "message": "A new recruiter has been added",
+            "data": recruiter
+        })
+    } catch (err) {
+        res.status(400)
+        throw new Error("Unable to add recruiter")
+    }
+
+
+
+
+})
+
+module.exports = { registerCompany, companyLogin, companyDetails, updateCompanyDetails, deleteCompany, addRecuriter }

@@ -10,8 +10,6 @@ const errorHandler = require("./middlewares/errorHandler")
 dotenv.config()
 
 
-
-
 // Databse Connection
 ConnectDB()
 
