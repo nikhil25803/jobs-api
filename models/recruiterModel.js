@@ -1,8 +1,13 @@
 const mongoose = require("mongoose")
 
 
-const UserSchema = mongoose.Schema({
-    user_id: {
+const RecruiterSchema = mongoose.Schema({
+    recruiter_id: {
+        type: String,
+        required: true,
+        immutable: true
+    },
+    company_email: {
         type: String,
         required: true,
         immutable: true
@@ -10,7 +15,8 @@ const UserSchema = mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        immutable: true
     },
     name: {
         type: String,
@@ -24,15 +30,11 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    github_url: {
-        type: String,
-        required: true
-    },
     linkedin_url: {
         type: String,
         requied: true
     },
-    resume_link: {
+    website_link: {
         type: String
     }
 },
@@ -41,5 +43,5 @@ const UserSchema = mongoose.Schema({
     }
 )
 
-const UserModel = mongoose.model("Users", UserSchema)
-module.exports = UserModel;
+const RecruiterModel = mongoose.model("Recruiter", RecruiterSchema)
+module.exports = RecruiterModel;

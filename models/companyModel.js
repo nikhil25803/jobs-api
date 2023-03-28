@@ -4,7 +4,8 @@ const mongoose = require("mongoose")
 const CompanySchema = mongoose.Schema({
     company_id: {
         type: String,
-        required: true
+        required: true,
+        immutable: true
     },
     name: {
         type: String,
