@@ -1,30 +1,25 @@
 const mongoose = require("mongoose")
 
 
-const RecruiterSchema = mongoose.Schema({
-    company_email: {
-        type: String,
-        required: true,
-        immutable: true
-    },
+const CompanySchema = mongoose.Schema({
     company_id: {
         type: String,
-        requied: true,
-        unique: true
-    },
-    username: {
-        type: String,
         required: true,
-        unique: true,
         immutable: true
     },
     name: {
         type: String,
-        required: true
+        required: true,
+        unique: true
+    },
+    owner_name: {
+        type: String,
+        required: true,
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     password: {
         type: String,
@@ -35,13 +30,22 @@ const RecruiterSchema = mongoose.Schema({
         requied: true
     },
     website_link: {
-        type: String
+        type: String,
+        required: true
     },
+    recruitersList: {
+        type: [
+            {
+                name: String,
+                email: String
+            }
+        ]
+    }
 },
     {
         timestamps: true
     }
 )
 
-const RecruiterModel = mongoose.model("Recruiter", RecruiterSchema)
-module.exports = RecruiterModel;
+const CompanyModel = mongoose.model("Company", CompanySchema)
+module.exports = CompanyModel;

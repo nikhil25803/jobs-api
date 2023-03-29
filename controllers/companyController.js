@@ -10,13 +10,13 @@ const registerCompany = asyncHandler(async (req, res) => {
     // Retreiving the company's attributes
     const {
         name,
+        company_code,
         owner_name,
         email,
         password,
         confirm_password,
         linkedin_url,
         website_link,
-        recruitersList,
     } = req.body
 
 
@@ -48,14 +48,14 @@ const registerCompany = asyncHandler(async (req, res) => {
     // Try to upload the file
     try {
         const newCompany = await CompanyModel.create({
-            company_id: uuid(),
             name,
+            company_code,
             owner_name,
             email,
             password: hashedPassword,
             linkedin_url,
             website_link,
-            recruitersList
+            allowedRecruiters: [null]
         })
         res.status(201).json({
             "status": res.statusCode,
@@ -80,9 +80,12 @@ const companyLogin = asyncHandler(async (req, res) => {
     if (company && bcrypt.compare(password, company.password)) {
         const accessToken = jwt.sign({
             company: {
-                company_id: company.company_id,
+                id: company._id,
+                company_code: company.company_code,
                 owner_name: company.owner_name,
-                email: company.email
+                email: company.email,
+                linkedin_url: company.linkedin_url,
+                website_link: company.website_link
             }
         }, process.env.JWT_ACCESS_TOKEN, { expiresIn: "30m" })
         res.status(200).json({
@@ -95,10 +98,10 @@ const companyLogin = asyncHandler(async (req, res) => {
 
 
 const companyDetails = asyncHandler(async (req, res) => {
-    const company_id = req.params.company_id
+    const company_code = req.params.company_code
 
-    if (company_id === req.user.company_id) {
-        const comapanyInDatabase = await CompanyModel.findOne({ company_id })
+    if (company_code === req.user.company_code) {
+        const comapanyInDatabase = await CompanyModel.findOne({ company_code })
         if (comapanyInDatabase) {
             res.status(200).json({
                 "status": res.statusCode,
@@ -117,14 +120,14 @@ const companyDetails = asyncHandler(async (req, res) => {
 })
 
 const updateCompanyDetails = asyncHandler(async (req, res) => {
-    const company_id = req.params.company_id
+    const company_code = req.params.company_code
 
-    if (company_id !== req.user.company_id) {
+    if (company_code !== req.user.company_code) {
         res.status(401)
-        throw new Error(`Comany with id: ${company_id} is either not loggedin or incorrect`)
+        throw new Error(`Comany with id: ${company_code} is either not loggedin or incorrect`)
     }
     const updatedDetails = await CompanyModel.findOneAndUpdate(
-        company_id,
+        company_code,
         req.body,
         { new: true }
     )
@@ -138,18 +141,18 @@ const updateCompanyDetails = asyncHandler(async (req, res) => {
 
 
 const deleteCompany = asyncHandler(async (req, res) => {
-    const company_id = req.params.company_id
+    const company_code = req.params.company_code
 
-    if (company_id !== req.user.company_id) {
+    if (company_code !== req.user.company_code) {
         res.status(401)
-        throw new Error(`Comany with id: ${company_id} is either not loggedin or incorrect`)
+        throw new Error(`Comany with id: ${company_code} is either not loggedin or incorrect`)
     }
     const companyToDelete = await CompanyModel.findOneAndDelete(
-        company_id,
+        company_code,
     )
     res.status(202).json({
         "status": res.statusCode,
-        "message": `Company with id: ${company_id} has been deleted`
+        "message": `Company with id: ${company_code} has been deleted`
     })
 })
 
@@ -159,15 +162,16 @@ const addRecuriter = asyncHandler(async (req, res) => {
         res.status(400)
         throw new Error("A body with email and name is required")
     }
-    const company_id = req.params.company_id
-    if (company_id !== req.user.company_id) {
+    const company_code = req.params.company_code
+    if (company_code !== req.user.company_code) {
         res.status(401)
-        throw new Error(`Comany with id: ${company_id} is either not loggedin or incorrect`)
+        throw new Error(`Comany with id: ${company_code} is either not loggedin or incorrect`)
     }
     // console.log(req.user);
     try {
-        const companyToAdd = await CompanyModel.findOne({ company_id })
-        const recruiterList = companyToAdd.recruitersList.push(recruiter)
+        const companyToAdd = await CompanyModel.findOne({ company_code })
+        // console.log(companyToAdd.recruiterList);
+        const recruiterList = companyToAdd.allowedRecruiters.push(recruiter)
         await companyToAdd.save()
         res.status(201).json({
             "status": res.statusCode,

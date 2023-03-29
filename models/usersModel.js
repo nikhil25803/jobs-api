@@ -2,11 +2,6 @@ const mongoose = require("mongoose")
 
 
 const UserSchema = mongoose.Schema({
-    user_id: {
-        type: String,
-        required: true,
-        immutable: true
-    },
     username: {
         type: String,
         required: true,
@@ -34,7 +29,13 @@ const UserSchema = mongoose.Schema({
     },
     resume_link: {
         type: String
-    }
+    },
+    appliedAt: [
+        {
+            company_name: String,
+            company_email: String,
+        }
+    ],
 },
     {
         timestamps: true

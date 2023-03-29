@@ -55,14 +55,14 @@ const registerUser = asyncHandler(async (req, res) => {
         const file = req.files[0]
         const result = await S3Upload.s3Uploadv3(file)
         const newUser = await UserModel.create({
-            user_id: uuid(),
             username,
             name,
             email,
             password: hashedPassword,
             github_url,
             linkedin_url,
-            resume_link: result
+            resume_link: result,
+            appliedAt: [null]
         })
         res.status(201).json({
             "status": res.statusCode,

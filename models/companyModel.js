@@ -2,12 +2,12 @@ const mongoose = require("mongoose")
 
 
 const CompanySchema = mongoose.Schema({
-    company_id: {
+    name: {
         type: String,
         required: true,
-        immutable: true
+        unique: true
     },
-    name: {
+    company_code: {
         type: String,
         required: true,
         unique: true
@@ -33,15 +33,12 @@ const CompanySchema = mongoose.Schema({
         type: String,
         required: true
     },
-    recruitersList: {
-        type: [
-            {
-                name: String,
-                email: String
-            }
-        ],
-        default: undefined
-    }
+    allowedRecruiters: [
+        {
+            name: String,
+            email: String,
+        },
+    ],
 },
     {
         timestamps: true

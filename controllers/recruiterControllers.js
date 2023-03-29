@@ -44,6 +44,7 @@ const registerRecruiter = asyncHandler(async (req, res) => {
     const recruiterAvailable = await CompanyModel.findOne(
         { email: company_email }
     )
+    console.log(recruiterAvailable._id);
     if (!recruiterAvailable) {
         res.status(400);
         throw new Error(`Company is not available. Please enter correct email`)
@@ -104,6 +105,7 @@ const loginRecruiter = asyncHandler(async (req, res) => {
     if (recruiter && bcrypt.compare(password, recruiter.password)) {
         const accessToken = jwt.sign({
             recruiter: {
+                id: recruiter._id,
                 recruiter_id: recruiter.recruiter_id,
                 username: recruiter.username,
                 email: recruiter.email,
