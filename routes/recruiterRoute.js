@@ -23,4 +23,17 @@ recruiterRoutes.put('/:username/update', recruiterTokenVerification, recruiterCo
 recruiterRoutes.delete('/:username/delete', recruiterTokenVerification, recruiterController.deleteRecruiter)
 
 
+/*
+
+Jobs Section
+- Create Job
+- Update Job
+- Delete Job
+- Select Applicants
+
+*/
+
+
+recruiterRoutes.post(":username/jobs/create", recruiterController.createJob)
+
 module.exports = recruiterRoutes;

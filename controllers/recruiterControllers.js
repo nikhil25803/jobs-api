@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt")
 const asyncHandler = require("express-async-handler")
 const RecruiterModel = require("../models/recruiterModel")
 const CompanyModel = require("../models/companyModel")
-const uuid = require("uuid").v4;
 const jwt = require("jsonwebtoken")
 
 
@@ -44,24 +43,25 @@ const registerRecruiter = asyncHandler(async (req, res) => {
     const recruiterAvailable = await CompanyModel.findOne(
         { email: company_email }
     )
-    console.log(recruiterAvailable._id);
+
     if (!recruiterAvailable) {
         res.status(400);
         throw new Error(`Company is not available. Please enter correct email`)
     }
 
-
-    const recruiters = recruiterAvailable.recruitersList
-    const isAllowed = recruiters.some(element => {
-        if (element.email === email) {
-            return true;
+    function search(nameKey, myArray) {
+        for (let i = 1; i < myArray.length; i++) {
+            if (myArray[i].email === nameKey) {
+                return myArray[i];
+            }
         }
+        return null;
+    }
+    const recruiters = recruiterAvailable.allowedRecruiters
+    const resultObject = search(email, recruiters);
 
-        return false;
-    });
 
-
-    if (isAllowed === false) {
+    if (resultObject === null) {
         res.status(400);
         throw new Error(`Recruiter with email: ${email} is not allowed to join the mentioned company`)
     }
@@ -74,12 +74,12 @@ const registerRecruiter = asyncHandler(async (req, res) => {
     // Try to upload the file
     try {
         const newRecruiter = await RecruiterModel.create({
-            recruiter_id: uuid(),
+            company_email: recruiterAvailable.email,
+            company_id: recruiterAvailable._id,
             username,
             name,
             email,
             password: hashedPassword,
-            company_email,
             linkedin_url,
             webiste_link
         })
@@ -181,4 +181,20 @@ const deleteRecruiter = asyncHandler(async (req, res) => {
 })
 
 
-module.exports = { registerRecruiter, loginRecruiter, recruiterDetails, updateRecruiter, deleteRecruiter }
+const createJob = asyncHandler(async (req, res) => {
+    const username = req.params.username
+    if (username !== req.user.username) {
+        res.status(401)
+        throw new Error(`Recruiter: ${username} is either not loggedin or incorrect`)
+    }
+})
+
+
+module.exports = {
+    registerRecruiter,
+    loginRecruiter,
+    recruiterDetails,
+    updateRecruiter,
+    deleteRecruiter,
+    createJob
+}

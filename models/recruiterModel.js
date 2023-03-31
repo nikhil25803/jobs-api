@@ -37,6 +37,12 @@ const RecruiterSchema = mongoose.Schema({
     website_link: {
         type: String
     },
+    jobsPosted: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"Jobs"
+        }
+    ]
 },
     {
         timestamps: true

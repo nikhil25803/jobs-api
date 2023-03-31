@@ -1,51 +1,58 @@
 const mongoose = require("mongoose")
 
 
-const CompanySchema = mongoose.Schema({
-    company_id: {
-        type: String,
-        required: true,
-        immutable: true
-    },
-    name: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    owner_name: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    password: {
+const JobsSchema = mongoose.Schema({
+    title: {
         type: String,
         required: true
     },
-    linkedin_url: {
+    role: {
         type: String,
+        required: true,
+    },
+    description: {
+        type: String,
+        required: true,
+    },
+    company_email: {
+        type: String,
+        required: true,
+    },
+    company_name: {
+        type: String,
+        required: true
+    },
+    company_website: {
+        type: String,
+        required: true
+    },
+    company_linkedin: {
+        type: String,
+        required: true
+    },
+    paid: {
+        type: Boolean,
         requied: true
     },
-    website_link: {
+    stipend: {
         type: String,
         required: true
     },
-    recruitersList: {
-        type: [
-            {
-                name: String,
-                email: String
-            }
-        ]
-    }
+    recruiter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Recruiter'
+    },
+    appliedBy: [
+        {
+            name: String,
+            email: String,
+        },
+    ]
 },
     {
         timestamps: true
     }
 )
 
-const CompanyModel = mongoose.model("Company", CompanySchema)
-module.exports = CompanyModel;
+const JobsModel = mongoose.model("Jobs", JobsSchema)
+module.exports = JobsModel;
