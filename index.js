@@ -5,6 +5,7 @@ const bodyparser = require("body-parser")
 const userRoutes = require("./routes/usersRoute")
 const companyRoutes = require("./routes/companyRoute")
 const recruiterRoutes = require("./routes/recruiterRoute")
+const jobsRoutes = require("./routes/jobsRoute")
 const errorHandler = require("./middlewares/errorHandler")
 
 // Load .env 
@@ -34,6 +35,7 @@ app.get('/', (req, res) => {
 })
 
 // Routes
+app.use('/jobs', jobsRoutes)
 app.use('/user', userRoutes)
 app.use('/company', companyRoutes)
 app.use('/recruiter', recruiterRoutes)

@@ -231,10 +231,8 @@ const createJob = asyncHandler(async (req, res) => {
             description,
             paid,
             stipend,
-            recruiter: req.user.id,
             appliedBy: [null]
         })
-
 
         // Populate recruiter field
         const recruiter = await RecruiterModel.findOne({ _id: req.user.id })
