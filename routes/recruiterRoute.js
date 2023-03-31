@@ -36,4 +36,20 @@ Jobs Section
 
 recruiterRoutes.post("/:username/jobs/create", recruiterTokenVerification, recruiterController.createJob)
 
+
+/*
+
+Jobs Selection Section
+- Check the Jobs created by the user
+- Check the users applied to a sepcific job
+- Select one user for a job
+
+*/
+
+recruiterRoutes.get("/:username/jobs", recruiterTokenVerification, recruiterController.listRecruiterJob)
+recruiterRoutes.get("/:username/:job_code")
+recruiterRoutes.get("/:username/:job_code/applicants")
+recruiterRoutes.get("/:username/:job_code/:email/select")
+
+
 module.exports = recruiterRoutes;

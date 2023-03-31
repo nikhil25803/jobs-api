@@ -53,7 +53,14 @@ const JobsSchema = mongoose.Schema({
             email: String,
             resume_link: String
         },
-    ]
+    ],
+    selectedCandidates: [
+        {
+            name: String,
+            email: String,
+            resume_link: String
+        },
+    ],
 },
     {
         timestamps: true

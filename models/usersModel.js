@@ -36,6 +36,13 @@ const UserSchema = mongoose.Schema({
             company_email: String,
         }
     ],
+    selectedAt: [
+        {
+            job_code: String,
+            company_email: String,
+            rescruiter_email: String
+        }
+    ],
 },
     {
         timestamps: true

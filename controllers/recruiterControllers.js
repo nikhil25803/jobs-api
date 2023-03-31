@@ -256,6 +256,31 @@ const createJob = asyncHandler(async (req, res) => {
     }
 })
 
+const listRecruiterJob = asyncHandler(async (req, res) => {
+    const username = req.params.username
+    if (username !== req.user.username) {
+        res.status(401)
+        throw new Error(`Recruiter: ${username} is either not loggedin or incorrect`)
+    }
+    const jobsPosted = req.user.jobsPosted
+    // console.log(jobsPosted);
+    let jobsCreated = []
+    for (let i = 0; i < jobsPosted.length; i++) {
+        let id = jobsPosted[i]
+        console.log(id);
+        const job = await JobsModel.findById({ _id: id })
+        if (job) {
+            jobsCreated.push(job)
+        }
+    }
+
+    console.log(jobsCreated);
+    res.status(200).json({
+        status: res.statusCode,
+        data: jobsCreated
+    })
+})
+
 
 module.exports = {
     registerRecruiter,
@@ -263,5 +288,6 @@ module.exports = {
     recruiterDetails,
     updateRecruiter,
     deleteRecruiter,
-    createJob
+    createJob,
+    listRecruiterJob
 }
