@@ -7,12 +7,18 @@ const RecruiterSchema = mongoose.Schema({
         required: true,
         immutable: true
     },
-    company_id: {
+    company_code: {
         type: String,
         requied: true,
         unique: true
     },
     username: {
+        type: String,
+        required: true,
+        unique: true,
+        immutable: true
+    },
+    password: {
         type: String,
         required: true,
         unique: true,
@@ -26,10 +32,6 @@ const RecruiterSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    password: {
-        type: String,
-        required: true
-    },
     linkedin_url: {
         type: String,
         requied: true
@@ -37,12 +39,10 @@ const RecruiterSchema = mongoose.Schema({
     website_link: {
         type: String
     },
-    jobsPosted: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref:"Jobs"
-        }
-    ]
+    jobsPosted: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Jobs'
+    }]
 },
     {
         timestamps: true

@@ -34,6 +34,6 @@ Jobs Section
 */
 
 
-recruiterRoutes.post(":username/jobs/create", recruiterController.createJob)
+recruiterRoutes.post("/:username/jobs/create", recruiterTokenVerification, recruiterController.createJob)
 
 module.exports = recruiterRoutes;

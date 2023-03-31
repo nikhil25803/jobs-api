@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler")
 const RecruiterModel = require("../models/recruiterModel")
 const CompanyModel = require("../models/companyModel")
 const jwt = require("jsonwebtoken")
+const JobsModel = require("../models/jobsModel")
 
 
 
@@ -94,6 +95,8 @@ const registerRecruiter = asyncHandler(async (req, res) => {
     }
 })
 
+
+
 const loginRecruiter = asyncHandler(async (req, res) => {
     const { username, password } = req.body
     if (!username || !password) {
@@ -103,13 +106,15 @@ const loginRecruiter = asyncHandler(async (req, res) => {
 
     const recruiter = await RecruiterModel.findOne({ username })
     if (recruiter && bcrypt.compare(password, recruiter.password)) {
+
         const accessToken = jwt.sign({
             recruiter: {
                 id: recruiter._id,
                 recruiter_id: recruiter.recruiter_id,
                 username: recruiter.username,
                 email: recruiter.email,
-                company_email: recruiter.company_email
+                company_email: recruiter.company_email,
+                jobsPosted: recruiter.jobsPosted
             }
         }, process.env.JWT_ACCESS_TOKEN, { expiresIn: "30m" })
         res.status(200)
@@ -182,10 +187,67 @@ const deleteRecruiter = asyncHandler(async (req, res) => {
 
 
 const createJob = asyncHandler(async (req, res) => {
+
+    // Accepting request body
+    const {
+        title,
+        role,
+        description,
+        paid,
+        stipend
+    } = req.body
+
+
+    // Cehck if all the required body is passed or not
+    if (!title || !role || !description || !paid || !stipend) {
+        res.status(400);
+        throw new Error("All fields are required")
+    }
+
     const username = req.params.username
     if (username !== req.user.username) {
         res.status(401)
         throw new Error(`Recruiter: ${username} is either not loggedin or incorrect`)
+    }
+
+
+    // Check company
+    const companyAvailable = await CompanyModel.findOne(
+        { email: req.user.company_email }
+    )
+    if (!companyAvailable) {
+        res.status(400);
+        throw new Error(`Company is not available. Please enter correct email`)
+    }
+
+    try {
+        const newJob = await JobsModel.create({
+            company_email: req.user.company_email,
+            company_name: companyAvailable.name,
+            company_website: companyAvailable.website_link,
+            company_linkedin: companyAvailable.linkedin_url,
+            title,
+            role,
+            description,
+            paid,
+            stipend,
+            recruiter: req.user.id,
+            appliedBy: [null]
+        })
+
+
+        const recruiter = await RecruiterModel.findOne({ _id: req.user.id })
+
+        const jobsPostedList = recruiter.jobsPosted.push(newJob)
+        await recruiter.save()
+        res.status(201).json({
+            "status": res.statusCode,
+            "message": "New Job has been created sucessfully",
+            "data": newJob
+        })
+    } catch (err) {
+        res.status(500)
+        throw new Error("Unable to create a new job")
     }
 })
 
