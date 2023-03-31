@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler")
 const S3Upload = require("../config/s3Service")
 const UserModel = require("../models/usersModel")
 const jwt = require("jsonwebtoken")
+const JobsModel = require("../models/jobsModel")
 
 
 
@@ -162,5 +163,80 @@ const deleteUser = asyncHandler(async (req, res) => {
     })
 })
 
+const listJobs = asyncHandler(async (req, res) => {
+    const username = req.params.username
+    if (username !== req.user.username) {
+        res.status(401)
+        throw new Error(`Username: ${username} is either not loggedin or incorrect`)
+    }
 
-module.exports = { registerUser, loginUser, userDetails, updateUser, deleteUser }
+    try {
+
+        const data = await JobsModel.find(
+            {},
+            {
+                appliedBy: 0
+            }
+        );
+
+
+        res.status(200).json({
+            "status": res.statusCode,
+            "data": data
+        })
+    } catch (err) {
+        res.status(500)
+        throw new Error("Couldn't fetch jobs")
+    }
+})
+
+
+const applyToAJob = asyncHandler(async (req, res) => {
+    const username = req.params.username
+    if (username !== req.user.username) {
+        res.status(401)
+        throw new Error(`Username: ${username} is either not loggedin or incorrect`)
+    }
+    const job_code = req.params.job_code
+    const jobAvailable = await JobsModel.findOne({ job_code })
+    if (!jobAvailable) {
+        res.status(404)
+        throw new Error(`Job with id: ${job_code} not available`)
+    }
+
+    function search(nameKey, myArray) {
+        for (let i = 1; i < myArray.length; i++) {
+            if (myArray[i].email === nameKey) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+    const appliedCandidateList = jobAvailable.appliedBy
+    const resultObject = search(req.user.email, appliedCandidateList);
+
+    if (resultObject === 1) {
+        res.status(400);
+        throw new Error(`User with email: ${req.user.email} has already applied for this job`)
+    }
+
+    try {
+        const userData = {
+            "name": req.user.name,
+            "email": req.user.email,
+            "resume_link": req.user.resume_link
+        }
+        jobAvailable.appliedBy.push(userData)
+
+        await jobAvailable.save()
+        res.status(200).json({
+            "status": res.statusCode
+        })
+    } catch (err) {
+        res.status(500)
+        throw new Error("Not able to apply for this Job")
+    }
+})
+
+
+module.exports = { registerUser, loginUser, userDetails, updateUser, deleteUser, listJobs, applyToAJob }

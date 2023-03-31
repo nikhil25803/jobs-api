@@ -43,10 +43,15 @@ const JobsSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    recruiter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Recruiter'
+    },
     appliedBy: [
         {
             name: String,
             email: String,
+            resume_link: String
         },
     ]
 },

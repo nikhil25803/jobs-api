@@ -3,7 +3,6 @@ const JobsModel = require("../models/jobsModel")
 
 
 const listJobs = asynchandler(async (req, res) => {
-
     try {
 
         const data = await JobsModel.find(

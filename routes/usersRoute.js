@@ -3,6 +3,7 @@ const userControllers = require("../controllers/usersControllers")
 const usersRoute = express.Router()
 const multer = require("multer")
 const authenticateToken = require("../middlewares/userTokenVerify")
+const jobsController = require("../controllers/jobsController")
 
 const storage = multer.memoryStorage()
 
@@ -37,6 +38,14 @@ usersRoute.put('/:username/update', authenticateToken, userControllers.updateUse
 
 // Delete a user by username
 usersRoute.delete('/:username/delete', authenticateToken, userControllers.deleteUser)
+
+
+// Get all jobs as an existing user
+usersRoute.get("/:username/jobs", authenticateToken, userControllers.listJobs)
+
+
+// Apply to a job
+usersRoute.get("/:username/:job_code/apply", authenticateToken, userControllers.applyToAJob)
 
 
 module.exports = usersRoute;
