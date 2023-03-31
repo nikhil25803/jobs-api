@@ -219,13 +219,13 @@ const createJob = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error(`Company is not available. Please enter correct email`)
     }
-
     try {
         const newJob = await JobsModel.create({
             company_email: req.user.company_email,
             company_name: companyAvailable.name,
             company_website: companyAvailable.website_link,
             company_linkedin: companyAvailable.linkedin_url,
+            job_code: `${companyAvailable.company_code}${Math.floor(Math.random() * 90000) + 10000}`,
             title,
             role,
             description,
@@ -236,10 +236,17 @@ const createJob = asyncHandler(async (req, res) => {
         })
 
 
+        // Populate recruiter field
         const recruiter = await RecruiterModel.findOne({ _id: req.user.id })
-
         const jobsPostedList = recruiter.jobsPosted.push(newJob)
         await recruiter.save()
+
+        // Populate company field
+        const company = await CompanyModel.findOne({ email: req.user.company_email })
+        const companyListedJobs = company.jobsListed.push(newJob)
+        await company.save()
+
+        // Send response message
         res.status(201).json({
             "status": res.statusCode,
             "message": "New Job has been created sucessfully",

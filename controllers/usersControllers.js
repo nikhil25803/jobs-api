@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt")
 const asyncHandler = require("express-async-handler")
 const S3Upload = require("../config/s3Service")
 const UserModel = require("../models/usersModel")
-const uuid = require("uuid").v4;
 const jwt = require("jsonwebtoken")
 
 
@@ -130,7 +129,7 @@ const userDetails = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
     const username = req.params.username
-    console.log(req.user);
+
     if (username !== req.user.username) {
         res.status(401)
         throw new Error(`Username: ${username} is either not loggedin or incorrect`)

@@ -38,7 +38,11 @@ const CompanySchema = mongoose.Schema({
             name: String,
             email: String,
         },
-    ]
+    ],
+    jobsListed: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Jobs'
+    }]
 },
     {
         timestamps: true

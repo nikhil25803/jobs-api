@@ -12,6 +12,7 @@ const registerCompany = asyncHandler(async (req, res) => {
         name,
         company_code,
         owner_name,
+        owner_email,
         email,
         password,
         confirm_password,
@@ -21,7 +22,7 @@ const registerCompany = asyncHandler(async (req, res) => {
 
 
     // Cehck if all the required body is passed or not
-    if (!name || !owner_name || !email && !password || !confirm_password || !website_link || !linkedin_url) {
+    if (!name || !owner_name || !owner_email || !email && !password || !confirm_password || !website_link || !linkedin_url) {
         res.status(400);
         throw new Error("All fields are required")
     }
@@ -55,7 +56,10 @@ const registerCompany = asyncHandler(async (req, res) => {
             password: hashedPassword,
             linkedin_url,
             website_link,
-            allowedRecruiters: [null]
+            allowedRecruiters: [{
+                name: owner_name,
+                email: owner_email
+            }]
         })
         res.status(201).json({
             "status": res.statusCode,
@@ -85,7 +89,9 @@ const companyLogin = asyncHandler(async (req, res) => {
                 owner_name: company.owner_name,
                 email: company.email,
                 linkedin_url: company.linkedin_url,
-                website_link: company.website_link
+                website_link: company.website_link,
+                allowedRecruiters: company.allowedRecruiters,
+                jobsListed: company.jobsListed,
             }
         }, process.env.JWT_ACCESS_TOKEN, { expiresIn: "30m" })
         res.status(200).json({
@@ -105,7 +111,7 @@ const companyDetails = asyncHandler(async (req, res) => {
         if (comapanyInDatabase) {
             res.status(200).json({
                 "status": res.statusCode,
-                "data": req.user
+                "data": comapanyInDatabase
             })
         } else {
             res.status(404).json({

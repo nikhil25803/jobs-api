@@ -21,7 +21,7 @@ const upload = multer({
 })
 
 // Create a new user
-usersRoute.post('/register', upload.array("files"), userControllers.registerUser)
+usersRoute.post('/register', upload.array("resume"), userControllers.registerUser)
 
 // Login the user
 usersRoute.post('/login', userControllers.loginUser)

@@ -18,6 +18,11 @@ const JobsSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    job_code: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     company_name: {
         type: String,
         required: true
