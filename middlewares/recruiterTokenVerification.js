@@ -1,6 +1,9 @@
 const jwt = require("jsonwebtoken");
 
+// Function to verify token entered by a recruiter
 function recruiterTokenVerification(req, res, next) {
+
+    // Get the token from the headers
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
 

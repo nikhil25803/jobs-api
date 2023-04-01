@@ -1,6 +1,9 @@
 const jwt = require("jsonwebtoken");
 
+// Function to verify token entered by a user
 function authenticateToken(req, res, next) {
+
+    // Get the bearer token from the headers
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
 

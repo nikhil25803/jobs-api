@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-
+// Defining Schema of a Job
 const JobsSchema = mongoose.Schema({
     title: {
         type: String,

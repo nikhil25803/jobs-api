@@ -4,9 +4,10 @@ const usersRoute = express.Router()
 const multer = require("multer")
 const authenticateToken = require("../middlewares/userTokenVerify")
 
-
+// Creating a `memoryStorage` instance of a multer object
 const storage = multer.memoryStorage()
 
+// Defining a function to add filters on the uploaded file.
 const fileFilter = (req, file, cb) => {
     if (file.mimetype === "application/pdf") {
         cb(null, true);
@@ -14,7 +15,6 @@ const fileFilter = (req, file, cb) => {
         cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE"), false);
     }
 };
-
 const upload = multer({
     storage,
     fileFilter,

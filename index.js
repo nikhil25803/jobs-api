@@ -21,7 +21,6 @@ const app = express()
 
 
 // Middlewares
-// app.use(express.json())
 app.use(bodyparser.urlencoded({ extended: true }))
 app.use(bodyparser.json())
 
@@ -39,7 +38,10 @@ app.use('/jobs', jobsRoutes)
 app.use('/user', userRoutes)
 app.use('/company', companyRoutes)
 app.use('/recruiter', recruiterRoutes)
+
+// Middleware to handle error thrown by an endpoint.
 app.use(errorHandler)
+
 
 // Define a PORT
 const PORT = process.env.PORT || 3000

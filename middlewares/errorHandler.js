@@ -1,3 +1,4 @@
+// Defining the constants
 const constants = {
     NOT_FOUND: 404,
     VALIDATION_ERROR: 400,
@@ -8,7 +9,10 @@ const constants = {
 
 
 const errorHandler = (err, req, res, next) => {
+
     const statusCode = res.statusCode ? res.statusCode : 500;
+
+    // Defining messages and title for each case (of errors)
     switch (statusCode) {
         case constants.VALIDATION_ERROR:
             res.json({
@@ -45,6 +49,7 @@ const errorHandler = (err, req, res, next) => {
             console.log("No Error, All good !");
             break;
     }
+    
     next();
     
 

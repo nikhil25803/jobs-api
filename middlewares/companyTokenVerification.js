@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
 
+
+// Function to verify token entered by a company
 function companyTokenVerification(req, res, next) {
+
+    // Get the headers
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
 

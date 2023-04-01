@@ -76,7 +76,9 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 })
 
+
 const loginUser = asyncHandler(async (req, res) => {
+
     const { username, password } = req.body
     if (!username || !password) {
         res.status(400)
@@ -110,19 +112,25 @@ const loginUser = asyncHandler(async (req, res) => {
 })
 
 const userDetails = asyncHandler(async (req, res) => {
+
     const username = req.params.username
     if (username === req.user.username) {
+
         const userInDatabase = await UserModel.findOne({ username })
         if (userInDatabase) {
             res.status(200).json({
                 "status": res.statusCode,
-                "data": req.user
+                "message": "Loggedin user's data has been fetched",
+                "data": userInDatabase
             })
+
         } else {
+
             res.status(404).json({
                 "status": res.statusCode,
                 "message": "User is not available"
             })
+
         }
     } else {
         res.status(500)
@@ -132,8 +140,8 @@ const userDetails = asyncHandler(async (req, res) => {
 
 
 const updateUser = asyncHandler(async (req, res) => {
-    const username = req.params.username
 
+    const username = req.params.username
     if (username !== req.user.username) {
         res.status(401)
         throw new Error(`Username: ${username} is either not loggedin or incorrect`)
@@ -150,9 +158,12 @@ const updateUser = asyncHandler(async (req, res) => {
         "message": "User data has been updated",
         "data": updatedUser
     })
+
 })
 
+
 const deleteUser = asyncHandler(async (req, res) => {
+
     const username = req.params.username
     if (username !== req.user.username) {
         res.status(401)
@@ -162,11 +173,14 @@ const deleteUser = asyncHandler(async (req, res) => {
     const userToDelete = await UserModel.findOneAndDelete(username)
     res.status(202).json({
         "status": res.statusCode,
-        "message": `User with username: ${username} has been deleted`
+        "message": `User with username: ${username} has been deleted`,
+        "data": userToDelete,
     })
+
 })
 
 const listJobs = asyncHandler(async (req, res) => {
+
     const username = req.params.username
     if (username !== req.user.username) {
         res.status(401)
@@ -174,15 +188,11 @@ const listJobs = asyncHandler(async (req, res) => {
     }
 
     try {
-
-        const data = await JobsModel.find(
-            {},
-            {
-                appliedBy: 0,
-                selectedCandidates: 0,
-            }
+        const data = await JobsModel.find({}, {
+            appliedBy: 0,
+            selectedCandidates: 0,
+        }
         );
-
 
         res.status(200).json({
             "status": res.statusCode,
@@ -225,6 +235,7 @@ const applyToAJob = asyncHandler(async (req, res) => {
         }
         return 0;
     }
+
     const appliedCandidateList = jobAvailable.appliedBy
     const resultObject = search(req.user.email, appliedCandidateList);
 
@@ -232,7 +243,9 @@ const applyToAJob = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error(`User with email: ${req.user.email} has already applied for this job`)
     }
+
     try {
+        // Push user's data to the `appledBy` section of the user's collection
         const userData = {
             "name": req.user.name,
             "username": username,
@@ -242,6 +255,7 @@ const applyToAJob = asyncHandler(async (req, res) => {
         jobAvailable.appliedBy.push(userData)
         await jobAvailable.save()
 
+        // Populate the `appliedAt` section of the user's collection
         const appliedAtData = {
             "company_name": jobAvailable.company_name,
             "company_email": jobAvailable.company_email,
@@ -262,4 +276,12 @@ const applyToAJob = asyncHandler(async (req, res) => {
 })
 
 
-module.exports = { registerUser, loginUser, userDetails, updateUser, deleteUser, listJobs, applyToAJob }
+module.exports = {
+    registerUser,
+    loginUser,
+    userDetails,
+    updateUser,
+    deleteUser,
+    listJobs,
+    applyToAJob
+}

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-
+// Defining Schema of a Recruiter
 const RecruiterSchema = mongoose.Schema({
     company_email: {
         type: String,
