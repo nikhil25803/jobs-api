@@ -62,7 +62,8 @@ const registerUser = asyncHandler(async (req, res) => {
             github_url,
             linkedin_url,
             resume_link: result,
-            appliedAt: [null]
+            appliedAt: [null],
+            selectedAt: [null]
         })
         res.status(201).json({
             "status": res.statusCode,
@@ -91,7 +92,9 @@ const loginUser = asyncHandler(async (req, res) => {
                 email: user.email,
                 github_url: user.github_url,
                 linkedin_url: user.linkedin_url,
-                resume_link: user.resume_link
+                resume_link: user.resume_link,
+                appliedAt: user.appliedAt,
+                selectedAt: user.selectedAt
             }
         }, process.env.JWT_ACCESS_TOKEN, { expiresIn: "30m" })
         res.status(200)
@@ -175,7 +178,8 @@ const listJobs = asyncHandler(async (req, res) => {
         const data = await JobsModel.find(
             {},
             {
-                appliedBy: 0
+                appliedBy: 0,
+                selectedCandidates: 0,
             }
         );
 
@@ -192,16 +196,25 @@ const listJobs = asyncHandler(async (req, res) => {
 
 
 const applyToAJob = asyncHandler(async (req, res) => {
+
     const username = req.params.username
     if (username !== req.user.username) {
         res.status(401)
         throw new Error(`Username: ${username} is either not loggedin or incorrect`)
     }
+
     const job_code = req.params.job_code
     const jobAvailable = await JobsModel.findOne({ job_code })
     if (!jobAvailable) {
         res.status(404)
         throw new Error(`Job with id: ${job_code} not available`)
+    }
+
+
+    const userAvailable = await UserModel.findOne({ username })
+    if (!userAvailable) {
+        res.status(404)
+        throw new Error(`User with username: ${username} not available`)
     }
 
     function search(nameKey, myArray) {
@@ -219,18 +232,28 @@ const applyToAJob = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error(`User with email: ${req.user.email} has already applied for this job`)
     }
-
     try {
         const userData = {
             "name": req.user.name,
+            "username": username,
             "email": req.user.email,
             "resume_link": req.user.resume_link
         }
         jobAvailable.appliedBy.push(userData)
-
         await jobAvailable.save()
+
+        const appliedAtData = {
+            "company_name": jobAvailable.company_name,
+            "company_email": jobAvailable.company_email,
+            "job_code": jobAvailable.job_code,
+        }
+        userAvailable.appliedAt.push(appliedAtData)
+        await userAvailable.save()
+
         res.status(200).json({
-            "status": res.statusCode
+            "status": res.statusCode,
+            "message": `Sucessfully applied for the job code ${job_code}`,
+            "data": appliedAtData
         })
     } catch (err) {
         res.status(500)

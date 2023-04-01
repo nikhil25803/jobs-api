@@ -8,7 +8,8 @@ const listJobs = asynchandler(async (req, res) => {
         const data = await JobsModel.find(
             {},
             {
-                appliedBy: 0
+                appliedBy: 0,
+                selectedCandidates: 0
             }
         );
 

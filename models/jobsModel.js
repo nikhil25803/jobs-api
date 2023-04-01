@@ -50,6 +50,7 @@ const JobsSchema = mongoose.Schema({
     appliedBy: [
         {
             name: String,
+            username: String,
             email: String,
             resume_link: String
         },

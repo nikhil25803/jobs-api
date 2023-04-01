@@ -34,13 +34,15 @@ const UserSchema = mongoose.Schema({
         {
             company_name: String,
             company_email: String,
+            job_code: String,
         }
     ],
     selectedAt: [
         {
             job_code: String,
+            company_name: String,
             company_email: String,
-            rescruiter_email: String
+            recruiter_email: String
         }
     ],
 },

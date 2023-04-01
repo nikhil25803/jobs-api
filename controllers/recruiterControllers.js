@@ -4,6 +4,7 @@ const RecruiterModel = require("../models/recruiterModel")
 const CompanyModel = require("../models/companyModel")
 const jwt = require("jsonwebtoken")
 const JobsModel = require("../models/jobsModel")
+const UserModel = require("../models/usersModel")
 
 
 
@@ -86,7 +87,7 @@ const registerRecruiter = asyncHandler(async (req, res) => {
         })
         res.status(201).json({
             "status": res.statusCode,
-            "message": "User has been created sucessfully",
+            "message": "Recruiter has been created sucessfully",
             "data": newRecruiter
         })
     } catch (err) {
@@ -113,8 +114,7 @@ const loginRecruiter = asyncHandler(async (req, res) => {
                 recruiter_id: recruiter.recruiter_id,
                 username: recruiter.username,
                 email: recruiter.email,
-                company_email: recruiter.company_email,
-                jobsPosted: recruiter.jobsPosted
+                company_email: recruiter.company_email
             }
         }, process.env.JWT_ACCESS_TOKEN, { expiresIn: "30m" })
         res.status(200)
@@ -231,14 +231,15 @@ const createJob = asyncHandler(async (req, res) => {
             description,
             paid,
             stipend,
-            appliedBy: [null]
+            recruiter: req.user.id,
+            appliedBy: [null],
+            selectedCandidates: [null]
         })
 
         // Populate recruiter field
         const recruiter = await RecruiterModel.findOne({ _id: req.user.id })
         const jobsPostedList = recruiter.jobsPosted.push(newJob)
         await recruiter.save()
-
         // Populate company field
         const company = await CompanyModel.findOne({ email: req.user.company_email })
         const companyListedJobs = company.jobsListed.push(newJob)
@@ -262,23 +263,102 @@ const listRecruiterJob = asyncHandler(async (req, res) => {
         res.status(401)
         throw new Error(`Recruiter: ${username} is either not loggedin or incorrect`)
     }
-    const jobsPosted = req.user.jobsPosted
-    // console.log(jobsPosted);
+
+    const jobsListed = await RecruiterModel.findOne({ username: req.user.username })
+    const jobsPosted = jobsListed.jobsPosted
     let jobsCreated = []
     for (let i = 0; i < jobsPosted.length; i++) {
         let id = jobsPosted[i]
-        console.log(id);
         const job = await JobsModel.findById({ _id: id })
         if (job) {
             jobsCreated.push(job)
         }
     }
 
-    console.log(jobsCreated);
     res.status(200).json({
         status: res.statusCode,
         data: jobsCreated
     })
+})
+
+const listApplicants = asyncHandler(async (req, res) => {
+    const username = req.params.username
+    if (username !== req.user.username) {
+        res.status(401)
+        throw new Error(`Recruiter: ${username} is either not loggedin or incorrect`)
+    }
+    const job_code = req.params.job_code
+
+    try {
+        const job = await JobsModel.findOne(
+            { job_code }
+        )
+
+        const applicants = job.appliedBy
+
+        res.status(200).json({
+            status: res.statusCode,
+            data: applicants
+        })
+    } catch (err) {
+        res.status(500)
+        throw new Error("Couldnt fetch the jobs created by the recruiter")
+    }
+
+
+})
+
+
+const selectCandidate = asyncHandler(async (req, res) => {
+    const username = req.params.username
+    if (username !== req.user.username) {
+        res.status(401)
+        throw new Error(`Recruiter: ${username} is either not loggedin or incorrect`)
+    }
+
+
+    const job_code = req.params.job_code
+    const job = await JobsModel.findOne({ job_code })
+    if (!job) {
+        res.status(500)
+        throw new Error(`Job with id: ${job_code} is not accesible now`)
+    }
+
+
+    const applicant_username = req.params.applicant_username
+    const user = await UserModel.findOne({ username: applicant_username })
+    if (!user) {
+        res.status(500)
+        throw new Error(`User with username: ${username} is not available`)
+    }
+
+    const selectedCandidatesDetails = {
+        "name": user.name,
+        "email": user.email,
+        "resume_link": user.resume_link
+    }
+
+    try {
+        job.selectedCandidates.push(selectedCandidatesDetails)
+        await job.save()
+
+        user.selectedAt.push({
+            "job_code": job.job_code,
+            "company_name": job.company_name,
+            "company_email": job.company_email,
+            "recruiter_email": req.user.email
+        })
+        await user.save()
+
+        res.status(200).json({
+            status: res.statusCode,
+            message: `${username} has been selected for this job`
+        })
+    } catch (err) {
+        res.status(500)
+        throw new Error("Faced issue while selecting the applicant")
+    }
+
 })
 
 
@@ -289,5 +369,7 @@ module.exports = {
     updateRecruiter,
     deleteRecruiter,
     createJob,
-    listRecruiterJob
+    listRecruiterJob,
+    listApplicants,
+    selectCandidate
 }

@@ -47,8 +47,13 @@ Jobs Selection Section
 */
 
 recruiterRoutes.get("/:username/jobs", recruiterTokenVerification, recruiterController.listRecruiterJob)
-recruiterRoutes.get("/:username/:job_code")
-recruiterRoutes.get("/:username/:job_code/applicants")
+
+
+recruiterRoutes.get("/:username/:job_code/applicants",recruiterTokenVerification, recruiterController.listApplicants)
+
+recruiterRoutes.get("/:username/:job_code/:applicant_username/select", recruiterTokenVerification, recruiterController.selectCandidate)
+
+
 recruiterRoutes.get("/:username/:job_code/:email/select")
 
 
