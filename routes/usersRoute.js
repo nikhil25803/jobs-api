@@ -3,7 +3,7 @@ const userControllers = require("../controllers/usersControllers")
 const usersRoute = express.Router()
 const multer = require("multer")
 const authenticateToken = require("../middlewares/userTokenVerify")
-const jobsController = require("../controllers/jobsController")
+
 
 const storage = multer.memoryStorage()
 
