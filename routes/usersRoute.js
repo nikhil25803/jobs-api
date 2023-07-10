@@ -45,7 +45,7 @@ usersRoute.get("/:username/jobs", authenticateToken, userControllers.listJobs)
 
 
 // Apply to a job
-usersRoute.get("/:username/:job_code/apply", authenticateToken, userControllers.applyToAJob)
+// usersRoute.get("/:username/:job_code/apply", authenticateToken, userControllers.applyToAJob)
 
 
 module.exports = usersRoute;
